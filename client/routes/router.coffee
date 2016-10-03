@@ -3,6 +3,7 @@ Blaze.registerHelper 'pathFor', (path, kw) ->
 
 BlazeLayout.setRoot 'body'
 
+
 FlowRouter.subscriptions = ->
 	Tracker.autorun =>
 		if Meteor.userId()
@@ -10,39 +11,56 @@ FlowRouter.subscriptions = ->
 			@register 'activeUsers', Meteor.subscribe('activeUsers')
 
 
-# FlowRouter.route '/',
-# 	name: 'index'
+FlowRouter.route '/',
+	name: 'index'
 
-# 	action: ->
-# 		BlazeLayout.render 'main', { modal: RocketChat.Layout.isEmbedded(), center: 'loading' }
-# 		if not Meteor.userId()
-# 			return FlowRouter.go 'home'
+	action: ->
+		BlazeLayout.render 'main', { modal: RocketChat.Layout.isEmbedded(), center: 'loading' }
 
-# 		Tracker.autorun (c) ->
-# 			if FlowRouter.subsReady() is true
-# 				Meteor.defer ->
-# 					if Meteor.user().defaultRoom?
-# 						room = Meteor.user().defaultRoom.split('/')
-# 						FlowRouter.go room[0], {name: room[1]}
-# 					else
-# 						FlowRouter.go 'home'
-# 				c.stop()
+		if not Meteor.userId()
+			return FlowRouter.go 'home'
+
+		Tracker.autorun (c) ->
+			if FlowRouter.subsReady() is true
+				Meteor.defer ->
+					if Meteor.user().defaultRoom?
+						room = Meteor.user().defaultRoom.split('/')
+						FlowRouter.go room[0], {name: room[1]}
+					else
+						FlowRouter.go 'home'
+				c.stop()
 
 
-# FlowRouter.route '/login',
-# 	name: 'login'
+FlowRouter.route '/login',
+	name: 'login'
 
-# 	action: ->
-# 		FlowRouter.go 'home'
+	action: ->
+		FlowRouter.go 'home'
+
+
+FlowRouter.route '/login',
+	name: 'login'
+
+	action: ->
+	    BlazeLayout.render 'main', center: 'loginForm'
+	    return
 
 
 FlowRouter.route '/home',
 	name: 'home'
 
 	action: ->
-		RocketChat.TabBar.showGroup 'home'
-		BlazeLayout.render 'main', {center: 'home'}
-		KonchatNotification.getDesktopPermission()
+        if Meteor.isClient
+            Deps.autorun ->
+                if ServerCookies.ready()
+                    cookieName = Meteor.settings['public'].cookieName
+                    Meteor.call 'getCookieByName', cookieName, (err, result) ->
+                        if result?
+                            Meteor.call 'getEmailByCookie', result, (err, email) ->
+                                Meteor.owinLogin email, (error) ->
+                                    RocketChat.TabBar.showGroup 'home'
+                                    BlazeLayout.render 'main', {center: 'home'}
+                                    KonchatNotification.getDesktopPermission()
 
 
 FlowRouter.route '/changeavatar',
