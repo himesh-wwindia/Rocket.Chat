@@ -43,6 +43,7 @@ facebook@1.2.9
 fastclick@1.0.12
 francocatena:status@1.5.3
 geojson-utils@1.0.9
+gfk:server-cookies@1.0.1
 github@1.1.8
 google@1.1.14
 hot-code-push@1.0.4
@@ -77,6 +78,7 @@ meteor@1.2.17
 meteor-base@1.0.4
 meteor-developer@1.1.9
 meteorhacks:inject-initial@1.0.4
+meteorhacks:picker@1.0.3
 meteorspark:util@0.2.0
 minifier-css@1.2.14
 minifier-js@1.2.14

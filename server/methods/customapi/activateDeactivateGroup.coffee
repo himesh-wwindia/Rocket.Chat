@@ -1,0 +1,26 @@
+Meteor.methods 
+  activateDeactivateGroup: (data) ->
+    try
+      check data.ClassRoomId, String
+      room = RocketChat.models.Rooms.findOne(ClassRoomId: data.ClassRoomId)
+      if room
+        if data.IsActive == 'true'
+          group = RocketChat.models.Rooms.unarchiveById(room._id)
+          return {
+            success: true
+            IsActive: data.IsActive
+          }
+        else
+          group = RocketChat.models.Rooms.archiveById(room._id)
+          return {
+            success: true
+            IsActive: data.IsActive
+          }
+      else
+        error = 
+          success: false
+          messge: 'ClassRoomId is not exist.'
+        return error
+    catch error
+      console.error error
+    return
