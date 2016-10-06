@@ -3,4 +3,4 @@ Meteor.methods
     apiUrl = Meteor.settings['public'].apiUrl
     url = apiUrl + '' + cookie
     result = HTTP.call('POST', url)
-    result.data
+    result.content
