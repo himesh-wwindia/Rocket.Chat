@@ -15,7 +15,7 @@ Meteor.methods
         userId = Accounts.createUser(userData)
         
         role = ''
-        if user.IsAdminUser == 'true'
+        if user.IsAdminUser == 'true'  or user.IsAdminUser == true
           role = 'admin'
         else
           role = 'user'

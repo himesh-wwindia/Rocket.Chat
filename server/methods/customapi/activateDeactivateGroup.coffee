@@ -4,14 +4,16 @@ Meteor.methods
       check data.ClassRoomId, String
       room = RocketChat.models.Rooms.findOne(ClassRoomId: data.ClassRoomId)
       if room
-        if data.IsActive == 'true'
-          group = RocketChat.models.Rooms.unarchiveById(room._id)
+        if data.IsActive == 'true' or data.IsActive == true
+          RocketChat.models.Rooms.unarchiveById(room._id)
+          RocketChat.models.Subscriptions.unarchiveByRoomId(room._id)
           return {
             success: true
             IsActive: data.IsActive
           }
         else
-          group = RocketChat.models.Rooms.archiveById(room._id)
+          RocketChat.models.Rooms.archiveById(room._id)
+          RocketChat.models.Subscriptions.archiveByRoomId(room._id)
           return {
             success: true
             IsActive: data.IsActive

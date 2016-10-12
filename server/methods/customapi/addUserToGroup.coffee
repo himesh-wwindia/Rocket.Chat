@@ -23,7 +23,7 @@ Meteor.methods
       muted = room.ro and !RocketChat.authz.hasPermission(user._id, 'post-readonly')
       RocketChat.models.Rooms.addUsernameById room._id, user.username, muted
       role = ''
-      if userData.IsGroupAdmin == 'true'
+      if userData.IsGroupAdmin == 'true' or userData.IsGroupAdmin == true
         role = 'owner'
       else
         role = 'user'
