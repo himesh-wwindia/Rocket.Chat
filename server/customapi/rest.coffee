@@ -3,6 +3,14 @@ async = Npm.require('async');
 Picker.middleware bodyParser.urlencoded(extended: true)
 Picker.middleware bodyParser.json()
 
+WebApp.connectHandlers.use (req, res, next) ->
+  res.setHeader 'Access-Control-Allow-Origin', '*'
+  res.setHeader 'Access-Control-Allow-Methods', 'POST,GET,OPTIONS,PUT,DELETE'
+  res.setHeader 'Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers,  X-Requested-With'
+  res.setHeader 'Content-Type', 'application/json'
+  next()
+
+
 post = Picker.filter((req, res) ->
   req.method == 'POST'
 )
@@ -19,7 +27,6 @@ post.route '/api/v1/createUser', (params, req, res, next) ->
         callback
       ), ->
         
-      res.setHeader 'Content-Type', 'application/json'
       if ids[0].uid?
         res.statusCode = 200
         res.end JSON.stringify({success:true, ids:ids})
@@ -44,7 +51,6 @@ post.route '/api/v1/createGroup', (params, req, res, next) ->
       group = req.body
       groupId = Meteor.call 'createNewGroup', group
       
-      res.setHeader 'Content-Type', 'application/json'
       if groupId
         statusMessage = {success: true}
         res.statusCode = 200
@@ -71,7 +77,6 @@ post.route '/api/v1/activateDeactivateGroup' , (params, req, res, next) ->
      
       result = Meteor.call 'activateDeactivateGroup', data
 
-      res.setHeader 'Content-Type', 'application/json'
       if result.success
         res.statusCode = 200
         res.end JSON.stringify(result)
@@ -98,7 +103,6 @@ post.route '/api/v1/addUsersToGroup' , (params, req, res, next) ->
         callback
       ), ->
       
-      res.setHeader 'Content-Type', 'application/json'
       if isUserAdded.success
         res.statusCode = 200
         res.end JSON.stringify({success: true})
@@ -126,7 +130,6 @@ post.route '/api/v1/deleteUsersFromGroup' , (params, req, res, next) ->
         callback
       ), ->
 
-      res.setHeader 'Content-Type', 'application/json'
       if isUserRemoved.success
        res.statusCode = 200
        res.end JSON.stringify({success: true})
@@ -153,7 +156,6 @@ post.route '/api/v1/activateUsersInGroup', (params, req, res, next) ->
         callback
       ), ->
         
-      res.setHeader 'Content-Type', 'application/json'
       if unmuteUser.success
         res.statusCode = 200
         res.end JSON.stringify({success: true})
@@ -179,7 +181,6 @@ post.route '/api/v1/deactivateUsersInGroup', (params, req, res, next) ->
         callback
       ), ->
 
-      res.setHeader 'Content-Type', 'application/json'
       if muteUser.success
         res.statusCode = 200
         res.end JSON.stringify({success: true})
@@ -187,7 +188,6 @@ post.route '/api/v1/deactivateUsersInGroup', (params, req, res, next) ->
         res.statusCode = 404
         res.end JSON.stringify(muteUser)
     else
-      res.setHeader 'Content-Type', 'application/json'
       res.statusCode = 422
       res.end JSON.stringify(
         message: 'data parameters not correct.')
