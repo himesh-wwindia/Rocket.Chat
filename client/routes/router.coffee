@@ -38,14 +38,6 @@ FlowRouter.route '/login',
 		FlowRouter.go 'home'
 
 
-FlowRouter.route '/login',
-	name: 'login'
-
-	action: ->
-	    BlazeLayout.render 'main', center: 'loginForm'
-	    return
-
-
 FlowRouter.route '/home',
 	name: 'home'
 
@@ -55,6 +47,8 @@ FlowRouter.route '/home',
                 if ServerCookies.ready()
                     cookieName = Meteor.settings['public'].cookieName
                     Meteor.call 'getCookieByName', cookieName, (err, result) ->
+                        console.log cookieName
+                        console.log result
                         if result?
                             Meteor.call 'getEmailByCookie', result, (err, email) ->
                                 Meteor.owinLogin email, (error) ->
