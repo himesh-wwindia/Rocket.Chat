@@ -13,5 +13,21 @@ Accounts.registerLoginHandler (loginRequest) ->
   console.log(user)
   if user
     userId = user._id
-  #send loggedin user's user id
+  else
+    if loginRequest.email?
+      name = loginRequest.email.substring(0, loginRequest.email.lastIndexOf('@'))
+      newUser =
+            name: name
+            username: loginRequest.email
+            emails :[{ address: loginRequest.email, verified: false }]
+            status: "offline"
+            statusDefault: "online"
+            utcOffset: 0
+            active: true
+            type:"user"
+            roles:["user"]
+
+      userId = RocketChat.models.Users.create(newUser)
+
   return { userId: userId }
+  #send loggedin user's user id
