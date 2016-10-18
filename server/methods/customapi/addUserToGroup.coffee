@@ -7,11 +7,32 @@ Meteor.methods
     user = RocketChat.models.Users.findOne(UserId: userData.UserId)
     # Check if user is already in room
     if !user
-      error = 
-        success: false
-        messge: 'userId is not exists.'
-        UserId: userData.UserId
-      return error
+      cookieName = Meteor.settings['public'].cookieName
+      console.log cookieName
+      Meteor.call 'getCookieByName', cookieName, (cookie) ->
+        console.log cookie
+        apiUrl = Meteor.settings['public'].apiUrl
+        url = apiUrl + '?userID=' + userData.UserId+"&cookie="+cookie
+        result = HTTP.call('POST', url)
+        email = result.email.toLowerCase()
+        newUser =
+              name: result.name
+              username: email
+              emails :[{ address: email, verified: false }]
+              status: "offline"
+              statusDefault: "online"
+              utcOffset: 0
+              active: true
+              type:"user"
+              roles:["user"]
+              UserId:result.id
+              DefaultLinkedSubscriptionCode:result.DefaultLinkedSubscriptionCode
+              profileURL:result.profileURL
+              profileType:result.profileType
+
+        userId = RocketChat.models.Users.create(newUser)
+        user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)
       if subscription
