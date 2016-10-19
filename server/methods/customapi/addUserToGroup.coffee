@@ -13,21 +13,27 @@ Meteor.methods
         result = HTTP.call('POST', url)
         console.log result
         if result.data?
-           email = result.data.email.toLowerCase()
-           newUser =
-              name: result.data.name
-              username: email
-              emails :[{ address: email, verified: false }]
-              status: "offline"
-              statusDefault: "online"
-              utcOffset: 0
-              active: true
-              type:"user"
-              roles:["user"]
-              UserId:result.data.id
-              DefaultLinkedSubscriptionCode:result.data.DefaultLinkedSubscriptionCode
-              profileURL:result.data.profileURL
-              profileType:result.data.profileType
+          email = result.data.email.toLowerCase()
+          
+          if result.data.profileType == 3
+            role = "admin"
+          else
+            role = "user"
+
+          newUser =
+            name: result.data.name
+            username: email
+            emails :[{ address: email, verified: false }]
+            status: "offline"
+            statusDefault: "online"
+            utcOffset: 0
+            active: true
+            type:"user"
+            roles:[role]
+            UserId:result.data.id.toString()
+            DefaultLinkedSubscriptionCode:result.data.DefaultLinkedSubscriptionCode
+            profileURL:result.data.profileURL
+            profileType:result.data.profileType
 
           RocketChat.models.Users.create(newUser)
           user = RocketChat.models.Users.findOne(UserId: userData.UserId)

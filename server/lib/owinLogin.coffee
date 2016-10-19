@@ -17,6 +17,12 @@ Accounts.registerLoginHandler (loginRequest) ->
   else
     if loginRequest.data.email?
       name = email.substring(0, email.lastIndexOf('@'))
+      
+      if loginRequest.data.profileType == 3
+        role = "admin"
+      else
+        role = "user"
+
       newUser =
             name: loginRequest.data.name
             username: email
@@ -26,8 +32,8 @@ Accounts.registerLoginHandler (loginRequest) ->
             utcOffset: 0
             active: true
             type:"user"
-            roles:["user"]
-            UserId:loginRequest.data.id
+            roles:[role]
+            UserId:loginRequest.data.id.toString()
             DefaultLinkedSubscriptionCode:loginRequest.data.DefaultLinkedSubscriptionCode
             profileURL:loginRequest.data.profileURL
             profileType:loginRequest.data.profileType
