@@ -2,7 +2,7 @@ Meteor.owinLogin = (email, callback) ->
   #create a login request with admin: true, so our loginHandler can handle this request
   loginRequest =
     owinAuth: true
-    email: email
+    data: email
   #send the login request
   Accounts.callLoginMethod
     methodArguments: [ loginRequest ]
@@ -16,9 +16,9 @@ Meteor.getProfile = (path, callback) ->
     query = {}
     i = 0
     while i < a.length
-	    b = a[i].split('=')
-	    query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] or '')
-	    i++
+      b = a[i].split('=')
+      query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] or '')
+      i++
     url = 'https://rocket-sso.auth0.com/userinfo'
     HTTP.get url, { headers:
       'content-type': 'application/json'

@@ -1,37 +1,42 @@
 Meteor.methods 
   addUserToGroup: (userData) ->
-    check userData.UserId, String
+   # check userData.UserId, Number
     check userData.ClassRoomId, String
     now = new Date
     room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
     user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+    console.log user
     # Check if user is already in room
     if !user
-      cookieName = Meteor.settings['public'].cookieName
-      console.log cookieName
-      Meteor.call 'getCookieByName', cookieName, (cookie) ->
-        console.log cookie
         apiUrl = Meteor.settings['public'].apiUrl
-        url = apiUrl + '?userID=' + userData.UserId+"&cookie="+cookie
+        url = apiUrl + '?userID=' + userData.UserId
         result = HTTP.call('POST', url)
-        email = result.email.toLowerCase()
-        newUser =
-              name: result.name
-              username: email
-              emails :[{ address: email, verified: false }]
-              status: "offline"
-              statusDefault: "online"
-              utcOffset: 0
-              active: true
-              type:"user"
-              roles:["user"]
-              UserId:result.id
-              DefaultLinkedSubscriptionCode:result.DefaultLinkedSubscriptionCode
-              profileURL:result.profileURL
-              profileType:result.profileType
+        console.log result
+        if result.data?
+          email = result.data.email.toLowerCase()
+          
+          if result.data.profileType == 3
+            role = "admin"
+          else
+            role = "user"
 
-        userId = RocketChat.models.Users.create(newUser)
-        user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+          newUser =
+            name: result.data.name
+            username: email
+            emails :[{ address: email, verified: false }]
+            status: "offline"
+            statusDefault: "online"
+            utcOffset: 0
+            active: true
+            type:"user"
+            roles:["user"]
+            UserId:result.data.id.toString()
+            DefaultLinkedSubscriptionCode:result.data.DefaultLinkedSubscriptionCode
+            profileURL:result.data.profileURL
+            profileType:result.data.profileType
+
+          RocketChat.models.Users.create(newUser)
+          user = RocketChat.models.Users.findOne(UserId: userData.UserId)
 
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)
