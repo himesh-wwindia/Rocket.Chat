@@ -24,7 +24,7 @@ Accounts.registerLoginHandler (loginRequest) ->
       
       newUser =
           email: email
-          password: loginRequest.data.DefaultLinkedSubscriptionCode
+          password: loginRequest.data.SubscriptionCode
         
       userId = Accounts.createUser(newUser)
       

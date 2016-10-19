@@ -21,7 +21,7 @@ Meteor.methods
 
           newUser =
               email: email
-              password: result.data.DefaultLinkedSubscriptionCode
+              password: result.data.SubscriptionCode
             
           userId = Accounts.createUser(newUser)
           
