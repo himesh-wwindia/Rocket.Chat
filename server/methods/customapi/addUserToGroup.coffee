@@ -29,7 +29,7 @@ Meteor.methods
             utcOffset: 0
             active: true
             type:"user"
-            roles:["user"]
+            roles:[role]
             UserId:result.data.id.toString()
             DefaultLinkedSubscriptionCode:result.data.DefaultLinkedSubscriptionCode
             profileURL:result.data.profileURL

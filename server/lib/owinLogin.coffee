@@ -32,7 +32,7 @@ Accounts.registerLoginHandler (loginRequest) ->
             utcOffset: 0
             active: true
             type:"user"
-            roles:["user"]
+            roles:[role]
             UserId:loginRequest.data.id.toString()
             DefaultLinkedSubscriptionCode:loginRequest.data.DefaultLinkedSubscriptionCode
             profileURL:loginRequest.data.profileURL
