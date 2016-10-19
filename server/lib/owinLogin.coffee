@@ -16,30 +16,27 @@ Accounts.registerLoginHandler (loginRequest) ->
     userId = user._id
   else
     if loginRequest.data.email?
-      name = email.substring(0, email.lastIndexOf('@'))
       
       if loginRequest.data.profileType == 3
         role = "admin"
       else
         role = "user"
-
+      
       newUser =
-            name: loginRequest.data.name
-            username: email
-            emails :[{ address: email, verified: false }]
-            status: "offline"
-            statusDefault: "online"
-            utcOffset: 0
-            active: true
-            type:"user"
-            roles:[role]
-            UserId:loginRequest.data.id.toString()
-            DefaultLinkedSubscriptionCode:loginRequest.data.DefaultLinkedSubscriptionCode
-            profileURL:loginRequest.data.profileURL
-            profileType:loginRequest.data.profileType
-
-
-      userId = RocketChat.models.Users.create(newUser)
+          email: email
+          password: loginRequest.data.DefaultLinkedSubscriptionCode
+        
+      userId = Accounts.createUser(newUser)
+      
+      update = '$set':
+        'name': loginRequest.data.name
+        'username': email
+        'roles': [ role ]
+        'UserId':loginRequest.data.id.toString()
+        'profileURL':loginRequest.data.profileURL
+        'profileType':loginRequest.data.profileType
+      
+      RocketChat.models.Users.update userId, update
 
   return { userId: userId }
   #send loggedin user's user id

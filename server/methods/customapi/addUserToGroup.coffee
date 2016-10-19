@@ -5,13 +5,12 @@ Meteor.methods
     now = new Date
     room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
     user = RocketChat.models.Users.findOne(UserId: userData.UserId)
-    console.log user
     # Check if user is already in room
     if !user
         apiUrl = Meteor.settings['public'].apiUrl
         url = apiUrl + '?userID=' + userData.UserId
         result = HTTP.call('POST', url)
-        console.log result
+       
         if result.data?
           email = result.data.email.toLowerCase()
           
@@ -21,21 +20,20 @@ Meteor.methods
             role = "user"
 
           newUser =
-            name: result.data.name
-            username: email
-            emails :[{ address: email, verified: false }]
-            status: "offline"
-            statusDefault: "online"
-            utcOffset: 0
-            active: true
-            type:"user"
-            roles:[role]
-            UserId:result.data.id.toString()
-            DefaultLinkedSubscriptionCode:result.data.DefaultLinkedSubscriptionCode
-            profileURL:result.data.profileURL
-            profileType:result.data.profileType
-
-          RocketChat.models.Users.create(newUser)
+              email: email
+              password: result.data.DefaultLinkedSubscriptionCode
+            
+          userId = Accounts.createUser(newUser)
+          
+          update = '$set':
+            'name': result.data.name
+            'username': email
+            'roles': [ role ]
+            'UserId':result.data.id.toString()
+            'profileURL':result.data.profileURL
+            'profileType':result.data.profileType
+          
+          RocketChat.models.Users.update userId, update
           user = RocketChat.models.Users.findOne(UserId: userData.UserId)
 
     if room
