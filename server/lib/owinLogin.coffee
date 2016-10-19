@@ -22,7 +22,7 @@ Accounts.registerLoginHandler (loginRequest) ->
         role = "admin"
       else
         role = "user"
-        
+
       newUser =
             name: loginRequest.data.name
             username: email
@@ -33,7 +33,7 @@ Accounts.registerLoginHandler (loginRequest) ->
             active: true
             type:"user"
             roles:["user"]
-            UserId:loginRequest.data.id
+            UserId:loginRequest.data.id.toString()
             DefaultLinkedSubscriptionCode:loginRequest.data.DefaultLinkedSubscriptionCode
             profileURL:loginRequest.data.profileURL
             profileType:loginRequest.data.profileType
