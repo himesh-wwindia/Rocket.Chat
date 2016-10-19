@@ -2,7 +2,7 @@ Meteor.owinLogin = (email, callback) ->
   #create a login request with admin: true, so our loginHandler can handle this request
   loginRequest =
     owinAuth: true
-    email: email
+    data: email
   #send the login request
   Accounts.callLoginMethod
     methodArguments: [ loginRequest ]

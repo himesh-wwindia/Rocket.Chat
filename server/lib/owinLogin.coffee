@@ -9,23 +9,29 @@ Accounts.registerLoginHandler (loginRequest) ->
 
   #we create a admin user if not exists, and get the userId
   userId = null
-  user = Meteor.users.findOne({ emails: { $elemMatch: { address: loginRequest.email} } })
+  email = loginRequest.data.email.toLowerCase()
+  user = Meteor.users.findOne({ emails: { $elemMatch: { address: email} } })
   console.log(user)
   if user
     userId = user._id
   else
-    if loginRequest.email?
-      name = loginRequest.email.substring(0, loginRequest.email.lastIndexOf('@'))
+    if loginRequest.data.email?
+      name = email.substring(0, email.lastIndexOf('@'))
       newUser =
-            name: name
-            username: loginRequest.email
-            emails :[{ address: loginRequest.email, verified: false }]
+            name: loginRequest.data.name
+            username: email
+            emails :[{ address: email, verified: false }]
             status: "offline"
             statusDefault: "online"
             utcOffset: 0
             active: true
             type:"user"
             roles:["user"]
+            UserId:loginRequest.data.id
+            DefaultLinkedSubscriptionCode:loginRequest.data.DefaultLinkedSubscriptionCode
+            profileURL:loginRequest.data.profileURL
+            profileType:loginRequest.data.profileType
+
 
       userId = RocketChat.models.Users.create(newUser)
 
