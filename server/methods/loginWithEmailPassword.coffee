@@ -11,7 +11,11 @@ Meteor.methods
                     email: email
                     password: password
                   
-                Accounts.createUser(newUser)
+                userId = Accounts.createUser(newUser)
+                update = '$set':
+                  'username': email
+
+                RocketChat.models.Users.update userId, update
 
             result = 
                 email:email
