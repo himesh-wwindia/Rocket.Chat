@@ -18,7 +18,10 @@ FlowRouter.route '/',
         context = FlowRouter.current()
         if context.queryParams.hasOwnProperty('data')?
             Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
-                Meteor.loginWithPassword result.email, result.password , (error) ->
+                if result.email?
+                    Meteor.loginWithPassword result.email, result.password , (error) ->
+                        FlowRouter.go 'home'
+                else
                     FlowRouter.go 'home'
         else
             BlazeLayout.render 'main', { modal: RocketChat.Layout.isEmbedded(), center: 'loading' }
