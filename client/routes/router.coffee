@@ -16,11 +16,8 @@ FlowRouter.route '/',
 
     action: ->
         context = FlowRouter.current()
-        console.log context
-        if context.queryParams?
-            console.log context.queryParams
+        if context.queryParams.hashOwnProperty('data')?
             Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
-                console.log result
                 Meteor.loginWithPassword result.email, result.password , (error) ->
                     FlowRouter.go 'home'
         else
