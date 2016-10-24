@@ -15,20 +15,28 @@ FlowRouter.route '/',
     name: 'index'
 
     action: ->
-        BlazeLayout.render 'main', { modal: RocketChat.Layout.isEmbedded(), center: 'loading' }
+        context = FlowRouter.current()
+        console.log context
+        if context.queryParams?
+            console.log context.queryParams
+            Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
+                console.log result
+                Meteor.loginWithPassword result.email, result.password , (error) ->
+                    FlowRouter.go 'home'
+        else
+            BlazeLayout.render 'main', { modal: RocketChat.Layout.isEmbedded(), center: 'loading' }
+            if not Meteor.userId()
+                return FlowRouter.go 'home'
 
-        if not Meteor.userId()
-            return FlowRouter.go 'home'
-
-        Tracker.autorun (c) ->
-            if FlowRouter.subsReady() is true
-                Meteor.defer ->
-                    if Meteor.user().defaultRoom?
-                        room = Meteor.user().defaultRoom.split('/')
-                        FlowRouter.go room[0], {name: room[1]}
-                    else
-                        FlowRouter.go 'home'
-                c.stop()
+            Tracker.autorun (c) ->
+                if FlowRouter.subsReady() is true
+                    Meteor.defer ->
+                        if Meteor.user().defaultRoom?
+                            room = Meteor.user().defaultRoom.split('/')
+                            FlowRouter.go room[0], {name: room[1]}
+                        else
+                            FlowRouter.go 'home'
+                    c.stop()
 
 
 FlowRouter.route '/login',
@@ -42,24 +50,37 @@ FlowRouter.route '/home',
     name: 'home'
 
     action: ->
-        if Meteor.isClient
-            Deps.autorun ->
-                if ServerCookies.ready()
-                    cookieName = Meteor.settings['public'].cookieName
-                    Meteor.call 'getCookieByName', cookieName, (err, result) ->
-                        console.log cookieName
-                        console.log result
-                        if result?
-                            Meteor.call 'getEmailByCookie', result, (err, email) ->
-                                Meteor.owinLogin email, (error) ->
-                                    RocketChat.TabBar.showGroup 'home'
-                                    BlazeLayout.render 'main', {center: 'home'}
-                                    KonchatNotification.getDesktopPermission()
-                                    
-                        else
-                            RocketChat.TabBar.showGroup 'home'
-                            BlazeLayout.render 'main', {center: 'home'}
-                            KonchatNotification.getDesktopPermission()
+        context = FlowRouter.current()
+        console.log context
+        if context.queryParams?
+            console.log context.queryParams
+            Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
+                console.log result
+                if result?
+                    Meteor.loginWithPassword result.email, result.password , (error) ->
+                
+                RocketChat.TabBar.showGroup 'home'
+                BlazeLayout.render 'main', {center: 'home'}
+                KonchatNotification.getDesktopPermission()
+        else
+            if Meteor.isClient
+                Deps.autorun ->
+                    if ServerCookies.ready()
+                        cookieName = Meteor.settings['public'].cookieName
+                        Meteor.call 'getCookieByName', cookieName, (err, result) ->
+                            console.log cookieName
+                            console.log result
+                            if result?
+                                Meteor.call 'getEmailByCookie', result, (err, email) ->
+                                    Meteor.owinLogin email, (error) ->
+                                        RocketChat.TabBar.showGroup 'home'
+                                        BlazeLayout.render 'main', {center: 'home'}
+                                        KonchatNotification.getDesktopPermission()
+                                        
+                            else
+                                RocketChat.TabBar.showGroup 'home'
+                                BlazeLayout.render 'main', {center: 'home'}
+                                KonchatNotification.getDesktopPermission()
                         
 
 
