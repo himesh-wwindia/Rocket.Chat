@@ -6,7 +6,7 @@ Meteor.methods
       
       groupData =
         name: group.Name
-        t: 'c'
+        t: 'p'
         usernames: []
         msgs: 0
         u:
