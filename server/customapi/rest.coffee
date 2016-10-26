@@ -49,6 +49,7 @@ post.route '/api/v1/createGroup', (params, req, res, next) ->
   try
     if req.body.Name? and req.body.ClassRoomId?
       group = req.body
+      group.t = "p"
       groupId = Meteor.call 'createNewGroup', group
       
       if groupId
