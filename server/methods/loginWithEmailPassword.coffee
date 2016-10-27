@@ -32,7 +32,6 @@ Meteor.methods
                   'profileType':result.data.profileType
                 
                 RocketChat.models.Users.update userId, update
-                user = RocketChat.models.Users.findOne(UserId: userData.UserId)
                 
             result = 
                 email:email
