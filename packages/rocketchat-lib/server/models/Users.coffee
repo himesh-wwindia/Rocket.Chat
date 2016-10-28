@@ -75,7 +75,7 @@ RocketChat.models.Users = new class extends RocketChat.models._Base
 
 		return @find query, options
 
-	findActiveByUsernameOrNameRegexWithExceptions: (searchTerm, exceptions = [], options = {}) ->
+	findActiveByUsernameOrNameRegexWithExceptions: (searchTerm, exceptions = [], users = [], options = {}) ->
 		if not _.isArray exceptions
 			exceptions = [ exceptions ]
 
@@ -89,6 +89,9 @@ RocketChat.models.Users = new class extends RocketChat.models._Base
 			active: true,
 			type: {
 				$in: ['user', 'bot']
+			},
+			username:{
+               $in: users 
 			},
 			$and: [{
 				username: {

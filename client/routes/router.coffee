@@ -16,7 +16,6 @@ FlowRouter.route '/',
 
     action: ->
         context = FlowRouter.current()
-        console.log context.queryParams.hasOwnProperty('data')
         if context.queryParams.hasOwnProperty('data')
             Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
                 if result.email?
@@ -56,10 +55,7 @@ FlowRouter.route '/home',
             Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
                 if result?
                     Meteor.loginWithPassword result.email, result.password , (error) ->
-                
-                RocketChat.TabBar.showGroup 'home'
-                BlazeLayout.render 'main', {center: 'home'}
-                KonchatNotification.getDesktopPermission()
+     
         else
             if Meteor.isClient
                 Deps.autorun ->
@@ -72,12 +68,10 @@ FlowRouter.route '/home',
                                         RocketChat.TabBar.showGroup 'home'
                                         BlazeLayout.render 'main', {center: 'home'}
                                         KonchatNotification.getDesktopPermission()
-                                        
-                            else
-                                RocketChat.TabBar.showGroup 'home'
-                                BlazeLayout.render 'main', {center: 'home'}
-                                KonchatNotification.getDesktopPermission()
-                        
+                            
+        RocketChat.TabBar.showGroup 'home'
+        BlazeLayout.render 'main', {center: 'home'}
+        KonchatNotification.getDesktopPermission()                
 
 
 FlowRouter.route '/changeavatar',
