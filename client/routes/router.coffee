@@ -65,9 +65,6 @@ FlowRouter.route '/home',
                             if result?
                                 Meteor.call 'getEmailByCookie', result, (err, email) ->
                                     Meteor.owinLogin email, (error) ->
-                                        RocketChat.TabBar.showGroup 'home'
-                                        BlazeLayout.render 'main', {center: 'home'}
-                                        KonchatNotification.getDesktopPermission()
                             
         RocketChat.TabBar.showGroup 'home'
         BlazeLayout.render 'main', {center: 'home'}

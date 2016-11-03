@@ -18,13 +18,16 @@ Meteor.publish 'userAutocomplete', (selector) ->
 
     exceptions = selector.exceptions or []
     
-    chatRoomUsers = RocketChat.models.Rooms.findUserChatRoomByUsername(exceptions[0])
-    users = []
-    chatRoomUsers.forEach (doc) ->
-      usernames = doc.usernames.forEach (user) ->
-        if exceptions[0] != user
-            users.push user
-     
+    user = RocketChat.models.Users.findOne(username: exceptions[0])
+
+    if user.profileType != 3
+        chatRoomUsers = RocketChat.models.Rooms.findUserChatRoomByUsername(exceptions[0])
+        users = []
+        chatRoomUsers.forEach (doc) ->
+          usernames = doc.usernames.forEach (user) ->
+            if exceptions[0] != user
+                users.push user
+
     cursorHandle = RocketChat.models.Users.findActiveByUsernameOrNameRegexWithExceptions(selector.term, exceptions, users, options).observeChanges
         added: (_id, record) ->
             pub.added("autocompleteRecords", _id, record)
