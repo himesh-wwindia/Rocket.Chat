@@ -10,7 +10,6 @@ Meteor.methods
         apiUrl = Meteor.settings['public'].apiUrl
         url = apiUrl + '?userID=' + userData.UserId
         result = HTTP.call('POST', url)
-       
         if result.data?
           email = result.data.email.toLowerCase()
           
@@ -35,7 +34,6 @@ Meteor.methods
           
           RocketChat.models.Users.update userId, update
           user = RocketChat.models.Users.findOne(UserId: userData.UserId)
-
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)
       if subscription

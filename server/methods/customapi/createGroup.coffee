@@ -5,7 +5,12 @@ Meteor.methods
       check group.ClassRoomId, String
       
       room = RocketChat.models.Rooms.findOne(ClassRoomId: group.ClassRoomId)
-      if !room
+
+      if room._id?
+        name = group.Name
+        RocketChat.models.Rooms.setNameById room._id, name
+        return true
+      else
         groupData =
           name: group.Name
           t: 'p'
@@ -19,10 +24,7 @@ Meteor.methods
         
         group = RocketChat.models.Rooms.insert(groupData)
         return group
-      else
-        name = group.Name
-        RocketChat.models.Rooms.setNameById room._id, name
-        return true
+      
 
     catch error
       console.error error
