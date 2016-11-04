@@ -5,14 +5,11 @@ Meteor.methods
       check group.ClassRoomId, String
       
       room = RocketChat.models.Rooms.findOne(ClassRoomId: group.ClassRoomId)
-      console.log room
-
+      
       if room?
-        console.log room
         name = group.Name
         RocketChat.models.Rooms.setNameById room._id, name
         return true
-      
       else
         groupData =
           name: group.Name
