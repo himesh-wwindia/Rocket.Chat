@@ -6,3 +6,4 @@ Meteor.methods
     result = HTTP.call('POST', url, {'Content-Type': 'application/json'})
     console.log('result from api - ', result)
     result.data
+   

@@ -34,6 +34,7 @@ Meteor.methods
           
           RocketChat.models.Users.update userId, update
           user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+    
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)
       if subscription
