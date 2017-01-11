@@ -1,3 +1,5 @@
+/* globals Livechat, LivechatVideoCall, MsgTyping */
+
 Template.messages.helpers({
 	messages() {
 		return ChatMessage.find({
@@ -24,6 +26,62 @@ Template.messages.helpers({
 		} else {
 			return t('Options');
 		}
+	},
+	videoCallEnabled() {
+		return Livechat.videoCall;
+	},
+	showConnecting() {
+		return Livechat.connecting;
+	},
+	usersTyping() {
+		const users = MsgTyping.get(visitor.getRoom());
+		if (users.length === 0) {
+			return;
+		}
+		if (users.length === 1) {
+			return {
+				multi: false,
+				selfTyping: MsgTyping.selfTyping.get(),
+				users: users[0]
+			};
+		}
+		// usernames = _.map messages, (message) -> return message.u.username
+		let last = users.pop();
+		if (users.length > 4) {
+			last = t('others');
+		}
+		// else
+		let usernames = users.join(', ');
+		usernames = [usernames, last];
+		return {
+			multi: true,
+			selfTyping: MsgTyping.selfTyping.get(),
+			users: usernames.join(` ${t('and')} `)
+		};
+	},
+	agentData() {
+		const agent = Livechat.agent;
+		if (!agent) {
+			return null;
+		}
+
+		const agentData = {
+			avatar: getAvatarUrlFromUsername(agent.username)
+		};
+
+		if (agent.name) {
+			agentData.name = agent.name;
+		}
+
+		if (agent.emails && agent.emails[0] && agent.emails[0].address) {
+			agentData.email = agent.emails[0].address;
+		}
+
+		if (agent.customFields && agent.customFields.phone) {
+			agentData.phone = agent.customFields.phone;
+		}
+
+		return agentData;
 	}
 });
 
@@ -52,6 +110,27 @@ Template.messages.events({
 	},
 	'click .toggle-options': function(event, instance) {
 		instance.showOptions.set(!instance.showOptions.get());
+	},
+	'click .video-button': function(event) {
+		event.preventDefault();
+
+		if (!Meteor.userId()) {
+			Meteor.call('livechat:registerGuest', { token: visitor.getToken() }, (error, result) => {
+				if (error) {
+					return console.log(error.reason);
+				}
+
+				Meteor.loginWithToken(result.token, (error) => {
+					if (error) {
+						return console.log(error.reason);
+					}
+
+					LivechatVideoCall.request();
+				});
+			});
+		} else {
+			LivechatVideoCall.request();
+		}
 	}
 });
 

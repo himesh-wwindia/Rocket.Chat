@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 socialSharing = (options = {}) ->
 	window.plugins.socialsharing.share(options.message, options.subject, options.file, options.link)
 
@@ -16,7 +18,7 @@ Template.room.helpers
 
 	favorite: ->
 		sub = ChatSubscription.findOne { rid: this._id }, { fields: { f: 1 } }
-		return 'icon-star favorite-room' if sub?.f? and sub.f and favoritesEnabled()
+		return 'icon-star favorite-room pending-color' if sub?.f? and sub.f and favoritesEnabled()
 		return 'icon-star-empty'
 
 	favoriteLabel: ->
@@ -28,7 +30,34 @@ Template.room.helpers
 		return isSubscribed(this._id)
 
 	messagesHistory: ->
-		return ChatMessage.find { rid: this._id, t: { '$ne': 't' }  }, { sort: { ts: 1 } }
+		hideMessagesOfType = []
+		RocketChat.settings.collection.find({_id: /Message_HideType_.+/}).forEach (record) ->
+			type = record._id.replace('Message_HideType_', '')
+			switch (type)
+				when 'mute_unmute'
+					types = [ 'user-muted', 'user-unmuted' ]
+				else
+					types = [ type ]
+			types.forEach (type) ->
+				index = hideMessagesOfType.indexOf(type)
+
+				if record.value is true and index is -1
+					hideMessagesOfType.push(type)
+				else if index > -1
+					hideMessagesOfType.splice(index, 1)
+
+		query =
+			rid: this._id
+
+		if hideMessagesOfType.length > 0
+			query.t =
+				$nin: hideMessagesOfType
+
+		options =
+			sort:
+				ts: 1
+
+		return ChatMessage.find(query, options)
 
 	hasMore: ->
 		return RoomHistoryManager.hasMore this._id
@@ -64,14 +93,7 @@ Template.room.helpers
 
 	userStatus: ->
 		roomData = Session.get('roomData' + this._id)
-
-		return {} unless roomData
-
-		if roomData.t in ['d', 'l']
-			username = _.without roomData.usernames, Meteor.user().username
-			return Session.get('user_' + username + '_status') || 'offline'
-		else
-			return 'offline'
+		return RocketChat.roomTypes.getUserStatus(roomData.t, this._id) or 'offline'
 
 	flexOpened: ->
 		return 'opened' if RocketChat.TabBar.isFlexOpen()
@@ -98,7 +120,10 @@ Template.room.helpers
 		return moment(this.since).calendar(null, {sameDay: 'LT'})
 
 	flexTemplate: ->
-		return RocketChat.TabBar.getTemplate()
+		if Session.get('openedRoom') is this._id
+			return RocketChat.TabBar.getTemplate()
+
+		return ''
 
 	flexData: ->
 		return _.extend {
@@ -367,7 +392,7 @@ Template.room.events
 			if RocketChat.Layout.isEmbedded()
 				return fireGlobalEvent('click-mention-link', { path: FlowRouter.path('channel', {name: channel}), channel: channel })
 
-			FlowRouter.go 'channel', {name: channel}
+			FlowRouter.go 'channel', { name: channel }, FlowRouter.current().queryParams
 			return
 
 		if RocketChat.Layout.isEmbedded()
@@ -397,8 +422,8 @@ Template.room.events
 			ChatMessage.update {_id: id}, {$set: {"urls.#{index}.collapsed": !collapsed}}
 
 	'dragenter .dropzone': (e) ->
-		items = e.originalEvent?.dataTransfer?.items
-		if items?.length > 0 and items?[0]?.kind isnt 'string' and userCanDrop this._id
+		types = e.originalEvent?.dataTransfer?.types
+		if types?.length > 0 and _.every(types, (type) => type.indexOf('text/') is -1 or type.indexOf('text/uri-list') isnt -1) and userCanDrop this._id
 			e.currentTarget.classList.add 'over'
 
 	'dragleave .dropzone-overlay': (e) ->
@@ -415,9 +440,7 @@ Template.room.events
 		event.currentTarget.parentNode.classList.remove 'over'
 
 		e = event.originalEvent or event
-		files = e.target.files
-		if not files or files.length is 0
-			files = e.dataTransfer?.files or []
+		files = e.dataTransfer?.files or []
 
 		filesToUpload = []
 		for file in files
@@ -549,18 +572,19 @@ Template.room.onRendered ->
 
 	messageBox = $('.messages-box')
 
-	template.isAtBottom = ->
-		if wrapper.scrollTop >= wrapper.scrollHeight - wrapper.clientHeight
-			newMessage.className = "new-message not"
+	template.isAtBottom = (scrollThreshold) ->
+		if not scrollThreshold? then scrollThreshold = 0
+		if wrapper.scrollTop + scrollThreshold >= wrapper.scrollHeight - wrapper.clientHeight
+			newMessage.className = "new-message background-primary-action-color not"
 			return true
 		return false
 
 	template.sendToBottom = ->
 		wrapper.scrollTop = wrapper.scrollHeight - wrapper.clientHeight
-		newMessage.className = "new-message not"
+		newMessage.className = "new-message background-primary-action-color not"
 
 	template.checkIfScrollIsAtBottom = ->
-		template.atBottom = template.isAtBottom()
+		template.atBottom = template.isAtBottom(100)
 		readMessage.enable()
 		readMessage.read()
 
@@ -612,6 +636,11 @@ Template.room.onRendered ->
 		Meteor.setTimeout ->
 			template.checkIfScrollIsAtBottom()
 		, 2000
+
+	wrapper.addEventListener 'scroll', ->
+		template.atBottom = false
+		Meteor.defer ->
+			template.checkIfScrollIsAtBottom()
 
 	$('.flex-tab-bar').on 'click', (e, t) ->
 		Meteor.setTimeout ->

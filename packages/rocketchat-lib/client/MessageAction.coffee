@@ -1,3 +1,6 @@
+import moment from 'moment'
+import toastr from 'toastr'
+
 RocketChat.MessageAction = new class
 	buttons = new ReactiveVar {}
 
@@ -90,7 +93,7 @@ Meteor.startup ->
 			message = @_arguments[1]
 			input = instance.find('.input-message')
 			url = RocketChat.MessageAction.getPermaLink(message._id)
-			text = '[ ](' + url + ') @' + message.u.username + ': '
+			text = '[ ](' + url + ') @' + message.u.username + ' '
 			if input.value
 				input.value += if input.value.endsWith(' ') then '' else ' '
 			input.value += text
@@ -120,9 +123,7 @@ Meteor.startup ->
 				input.updateAutogrow()
 			, 200
 		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
-
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+			if not RocketChat.models.Subscriptions.findOne({ rid: message.rid })?
 				return false
 
 			hasPermission = RocketChat.authz.hasAtLeastOnePermission('edit-message', message.rid)
@@ -153,9 +154,7 @@ Meteor.startup ->
 			RocketChat.MessageAction.hideDropDown()
 			chatMessages[Session.get('openedRoom')].confirmDeleteMsg(message)
 		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
-
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+			if not RocketChat.models.Subscriptions.findOne({ rid: message.rid })?
 				return false
 
 			hasPermission = RocketChat.authz.hasAtLeastOnePermission('delete-message', message.rid)
@@ -184,13 +183,15 @@ Meteor.startup ->
 		]
 		action: (event, instance) ->
 			message = @_arguments[1]
+			permalink = RocketChat.MessageAction.getPermaLink(message._id)
 			RocketChat.MessageAction.hideDropDown()
-			$(event.currentTarget).attr('data-clipboard-text', RocketChat.MessageAction.getPermaLink(message._id));
+			if Meteor.isCordova
+				cordova.plugins.clipboard.copy(permalink);
+			else
+				$(event.currentTarget).attr('data-clipboard-text', permalink);
 			toastr.success(TAPi18n.__('Copied'))
 		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
-
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+			if not RocketChat.models.Subscriptions.findOne({ rid: message.rid })?
 				return false
 
 			return true
@@ -208,12 +209,13 @@ Meteor.startup ->
 		action: (event, instance) ->
 			message = @_arguments[1].msg
 			RocketChat.MessageAction.hideDropDown()
-			$(event.currentTarget).attr('data-clipboard-text', message)
+			if Meteor.isCordova
+				cordova.plugins.clipboard.copy(message);
+			else
+				$(event.currentTarget).attr('data-clipboard-text', message)
 			toastr.success(TAPi18n.__('Copied'))
 		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
-
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+			if not RocketChat.models.Subscriptions.findOne({ rid: message.rid })?
 				return false
 
 			return true
@@ -238,9 +240,7 @@ Meteor.startup ->
 			input.focus()
 			RocketChat.MessageAction.hideDropDown()
 		validation: (message) ->
-			room = RocketChat.models.Rooms.findOne({ _id: message.rid })
-
-			if Array.isArray(room.usernames) && room.usernames.indexOf(Meteor.user().username) is -1
+			if not RocketChat.models.Subscriptions.findOne({ rid: message.rid })?
 				return false
 
 			return true

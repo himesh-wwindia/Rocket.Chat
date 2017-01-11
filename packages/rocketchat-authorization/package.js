@@ -11,7 +11,8 @@ Package.onUse(function(api) {
 		'ecmascript',
 		'coffeescript',
 		'underscore',
-		'rocketchat:lib'
+		'rocketchat:lib',
+		'less'
 	]);
 
 	api.use('mongo', ['client', 'server']);
@@ -31,6 +32,7 @@ Package.onUse(function(api) {
 	api.addFiles('client/startup.coffee', ['client']);
 	api.addFiles('client/hasPermission.coffee', ['client']);
 	api.addFiles('client/hasRole.coffee', ['client']);
+	api.addFiles('client/requiresPermission.html', ['client']);
 
 	api.addFiles('client/route.coffee', ['client']);
 

@@ -62,7 +62,7 @@ Template.livechat.helpers({
 		const statusLivechat = Template.instance().statusLivechat.get();
 
 		return {
-			status: statusLivechat,
+			status: statusLivechat === 'available' ? 'status-online' : 'status-offline',
 			icon: statusLivechat === 'available' ? 'icon-toggle-on' : 'icon-toggle-off',
 			hint: statusLivechat === 'available' ? t('Available') : t('Not_Available')
 		};
@@ -114,7 +114,7 @@ Template.livechat.events({
 			if (isConfirm) {
 				Meteor.call('livechat:takeInquiry', this._id, (error, result) => {
 					if (!error) {
-						FlowRouter.go(RocketChat.roomTypes.getRouteLink(result.t, result));
+						RocketChat.roomTypes.openRouteLink(result.t, result);
 					}
 				});
 			}
@@ -126,8 +126,12 @@ Template.livechat.onCreated(function() {
 	this.statusLivechat = new ReactiveVar();
 
 	this.autorun(() => {
-		const user = RocketChat.models.Users.findOne(Meteor.userId(), { fields: { statusLivechat: 1 } });
-		this.statusLivechat.set(user.statusLivechat);
+		if (Meteor.userId()) {
+			const user = RocketChat.models.Users.findOne(Meteor.userId(), { fields: { statusLivechat: 1 } });
+			this.statusLivechat.set(user.statusLivechat);
+		} else {
+			this.statusLivechat.set();
+		}
 	});
 
 	this.subscribe('livechat:inquiry');

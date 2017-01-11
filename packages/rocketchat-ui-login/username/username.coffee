@@ -33,7 +33,7 @@ Template.username.events
 		button = $(event.target).find('button.login')
 		RocketChat.Button.loading(button)
 
-		value = $("input").val().trim()
+		value = $("#username").val().trim()
 		if value is ''
 			username.empty = true
 			instance.username.set(username)
@@ -52,6 +52,3 @@ Template.username.events
 			RocketChat.Button.reset(button)
 			instance.username.set(username)
 			RocketChat.callbacks.run('usernameSet')
-
-			if not err?
-				Meteor.call 'joinDefaultChannels'

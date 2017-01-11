@@ -14,6 +14,14 @@ Meteor.startup(function() {
 		i18nLabel: 'Display_offline_form'
 	});
 
+	RocketChat.settings.add('Livechat_validate_offline_email', true, {
+		type: 'boolean',
+		group: 'Livechat',
+		public: true,
+		section: 'Offline',
+		i18nLabel: 'Validate_email_address'
+	});
+
 	RocketChat.settings.add('Livechat_offline_form_unavailable', '', {
 		type: 'string',
 		group: 'Livechat',
@@ -184,6 +192,39 @@ Meteor.startup(function() {
 		type: 'boolean',
 		group: 'Livechat',
 		public: true,
-		i18nLabel: 'Office_Hours_Enabled'
+		i18nLabel: 'Office_hours_enabled'
 	});
+
+	RocketChat.settings.add('Livechat_videocall_enabled', false, {
+		type: 'boolean',
+		group: 'Livechat',
+		public: true,
+		i18nLabel: 'Videocall_enabled',
+		i18nDescription: 'Beta_feature_Depends_on_Video_Conference_to_be_enabled',
+		enableQuery: { _id: 'Jitsi_Enabled', value: true }
+	});
+
+	RocketChat.settings.add('Livechat_enable_transcript', false, {
+		type: 'boolean',
+		group: 'Livechat',
+		public: true,
+		i18nLabel: 'Transcript_Enabled'
+	});
+
+	RocketChat.settings.add('Livechat_transcript_message', 'Would you like a copy of this chat emailed?', {
+		type: 'string',
+		group: 'Livechat',
+		public: true,
+		i18nLabel: 'Transcript_message',
+		enableQuery: { _id: 'Livechat_enable_transcript', value: true }
+	});
+
+	RocketChat.settings.add('Livechat_open_inquiery_show_connecting', false, {
+		type: 'boolean',
+		group: 'Livechat',
+		public: true,
+		i18nLabel: 'Livechat_open_inquiery_show_connecting',
+		enableQuery: { _id: 'Livechat_Routing_Method', value: 'Guest_Pool' }
+	});
+
 });

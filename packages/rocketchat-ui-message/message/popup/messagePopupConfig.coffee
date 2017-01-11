@@ -82,21 +82,21 @@ Template.messagePopupConfig.helpers
 							status: item.status
 							sort: 1
 
-				# Get users of room
-				if items.length < 5 and filter?.trim() isnt ''
-					messageUsers = _.pluck(items, 'username')
-					Tracker.nonreactive ->
-						roomUsernames = RocketChat.models.Rooms.findOne(Session.get('openedRoom')).usernames
-						for roomUsername in roomUsernames
-							if messageUsers.indexOf(roomUsername) is -1 and exp.test(roomUsername)
-								items.push
-									_id: roomUsername
-									username: roomUsername
-									status: Session.get('user_' + roomUsername + '_status') or 'offline'
-									sort: 2
+				# # Get users of room
+				# if items.length < 5 and filter?.trim() isnt ''
+				# 	messageUsers = _.pluck(items, 'username')
+				# 	Tracker.nonreactive ->
+				# 		roomUsernames = RocketChat.models.Rooms.findOne(Session.get('openedRoom')).usernames
+				# 		for roomUsername in roomUsernames
+				# 			if messageUsers.indexOf(roomUsername) is -1 and exp.test(roomUsername)
+				# 				items.push
+				# 					_id: roomUsername
+				# 					username: roomUsername
+				# 					status: Session.get('user_' + roomUsername + '_status') or 'offline'
+				# 					sort: 2
 
-								if items.length >= 5
-									break
+				# 				if items.length >= 5
+				# 					break
 
 				# Get users from db
 				if items.length < 5 and filter?.trim() isnt ''
@@ -113,6 +113,17 @@ Template.messagePopupConfig.helpers
 				exp = new RegExp("(^|\\s)#{RegExp.escape filter}", 'i')
 				if exp.test(all.username) or exp.test(all.compatibility)
 					items.push all
+
+				here =
+					_id: 'here'
+					username: 'here'
+					system: true
+					name: t 'Notify_active_in_this_room'
+					compatibility: 'channel group'
+					sort: 4
+
+				if exp.test(here.username) or exp.test(here.compatibility)
+					items.push here
 
 				return items
 

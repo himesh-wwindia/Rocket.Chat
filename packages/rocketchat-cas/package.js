@@ -27,5 +27,5 @@ Package.onUse(function(api) {
 });
 
 Npm.depends({
-	cas: '0.0.3'
+	cas: 'https://github.com/kcbanner/node-cas/tarball/fcd27dad333223b3b75a048bce27973fb3ca0f62'
 });

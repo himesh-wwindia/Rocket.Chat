@@ -1,4 +1,5 @@
 /* globals Push */
+import moment from 'moment';
 
 RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 	// skips this callback if the message was edited
@@ -24,7 +25,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 		return -1;
 	};
 
-	var settings, desktopMentionIds, i, j, len, len1, highlights, mentionIds, highlightsIds, usersWithHighlights, mobileMentionIds, ref, ref1, toAll, userIdsToNotify, userIdsToPushNotify, userOfMention, userOfMentionId, usersOfDesktopMentions, usersOfMentionId, usersOfMentionItem, usersOfMobileMentions;
+	var settings, desktopMentionIds, i, j, len, len1, highlights, mentionIds, highlightsIds, usersWithHighlights, mobileMentionIds, ref, ref1, toAll, toHere, userIdsToNotify, userIdsToPushNotify, userOfMention, userOfMentionId, usersOfDesktopMentions, usersOfMentionId, usersOfMentionItem, usersOfMobileMentions;
 
 	/**
 	 * Checks if a given user can be notified
@@ -73,7 +74,9 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 	settings.alwaysNotifyMobileUsers = [];
 	settings.dontNotifyMobileUsers = [];
 	settings.desktopNotificationDurations = {};
-	RocketChat.models.Subscriptions.findNotificationPreferencesByRoom(room._id).forEach(function(subscription) {
+
+	const notificationPreferencesByRoom = RocketChat.models.Subscriptions.findNotificationPreferencesByRoom(room._id);
+	notificationPreferencesByRoom.forEach(function(subscription) {
 		if (subscription.desktopNotifications === 'all') {
 			settings.alwaysNotifyDesktopUsers.push(subscription.u._id);
 		} else if (subscription.desktopNotifications === 'nothing') {
@@ -90,10 +93,11 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 	userIdsToNotify = [];
 	userIdsToPushNotify = [];
 	usersWithHighlights = [];
+
 	highlights = RocketChat.models.Users.findUsersByUsernamesWithHighlights(room.usernames, { fields: { '_id': 1, 'settings.preferences.highlights': 1 }}).fetch();
 
 	highlights.forEach(function(user) {
-		if (user && user.settings && user.settings.preferences && messageContainsHighlight(message, user.settings.preferences.highlights)) {
+		if (messageContainsHighlight(message, user.settings.preferences.highlights)) {
 			usersWithHighlights.push(user);
 		}
 	});
@@ -147,6 +151,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 				}
 			});
 		}
+
 		if ((userOfMention != null) && canBeNotified(userOfMentionId, 'desktop')) {
 			if (Push.enabled === true && userOfMention.statusConnection !== 'online') {
 				Push.send({
@@ -173,6 +178,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 				return message;
 			}
 		}
+
 	} else {
 		mentionIds = [];
 		if ((ref = message.mentions) != null) {
@@ -181,6 +187,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 			});
 		}
 		toAll = mentionIds.indexOf('all') > -1;
+		toHere = mentionIds.indexOf('here') > -1;
 		if (mentionIds.length > 0 || settings.alwaysNotifyDesktopUsers.length > 0) {
 			desktopMentionIds = _.union(mentionIds, settings.alwaysNotifyDesktopUsers);
 			desktopMentionIds = _.difference(desktopMentionIds, settings.dontNotifyDesktopUsers);
@@ -248,7 +255,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 			}), '_id');
 		}
 
-		if (toAll && ((ref1 = room.usernames) != null ? ref1.length : void 0) > 0) {
+		if ((toAll || toHere) && ((ref1 = room.usernames) != null ? ref1.length : void 0) > 0) {
 			RocketChat.models.Users.find({
 				username: {
 					$in: room.usernames
@@ -268,7 +275,7 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 				if (((ref2 = user.status) === 'online' || ref2 === 'away' || ref2 === 'busy') && (ref3 = user._id, indexOf.call(settings.dontNotifyDesktopUsers, ref3) < 0)) {
 					userIdsToNotify.push(user._id);
 				}
-				if (user.statusConnection !== 'online' && (ref4 = user._id, indexOf.call(settings.dontNotifyMobileUsers, ref4) < 0)) {
+				if (toAll && user.statusConnection !== 'online' && (ref4 = user._id, indexOf.call(settings.dontNotifyMobileUsers, ref4) < 0)) {
 					return userIdsToPushNotify.push(user._id);
 				}
 			});
