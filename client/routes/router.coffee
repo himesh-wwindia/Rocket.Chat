@@ -20,7 +20,11 @@ FlowRouter.route '/',
             Meteor.call 'loginWithEmailPassword', context.queryParams, (error, result) ->
                 if result.email?
                     Meteor.loginWithPassword result.email, result.password , (error) ->
-                        FlowRouter.go 'home'
+                        RocketChat.CachedCollectionManager.clearAllCache()
+                        if result.chatWithEmail?
+                            FlowRouter.go '/direct/'+result.chatWithEmail
+                        else
+                            FlowRouter.go 'home'
                 else
                     FlowRouter.go 'home'
         else
@@ -142,4 +146,4 @@ FlowRouter.route '/register/:hash',
         #       else
         #           BlazeLayout.render 'logoLayout', { render: 'invalidSecretURL' }
         # else
-        #   BlazeLayout.render 'logoLayout', { render: 'invalidSecretURL' }
+#   BlazeLayout.render 'logoLayout', { render: 'invalidSecretURL' }
