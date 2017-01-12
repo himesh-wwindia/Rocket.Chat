@@ -6,6 +6,7 @@ Meteor.methods
             email = credential[0].toLowerCase()
             password = credential[1]
             userId = credential[2]
+            chatWithEmail = credential[3]
             user = Meteor.users.findOne({ emails: { $elemMatch: { address: email} } })
             if !user
                 apiUrl = Meteor.settings['public'].apiUrl
@@ -36,4 +37,5 @@ Meteor.methods
             result = 
                 email:email
                 password:password
+                chatWithEmail:chatWithEmail
             return result

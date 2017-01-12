@@ -75,13 +75,19 @@ FlowRouter.route('/', {
     var context;
     context = FlowRouter.current();
     if (context.queryParams.hasOwnProperty('data')) {
-      return Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
+       Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result.email != null) {
-          return Meteor.loginWithPassword(result.email, result.password, function(error) {
-            return FlowRouter.go('home');
+          Meteor.loginWithPassword(result.email, result.password, function(error) {
+            RocketChat.CachedCollectionManager.clearAllCache();
+
+            if (result.chatWithEmail != null) {
+              FlowRouter.go('/direct/' + result.chatWithEmail);
+            } else {
+              FlowRouter.go('home');
+            }
           });
         } else {
-          return FlowRouter.go('home');
+          FlowRouter.go('home');
         }
       });
     } else {
@@ -90,22 +96,22 @@ FlowRouter.route('/', {
         center: 'loading'
       });
       if (!Meteor.userId()) {
-        return FlowRouter.go('home');
+        FlowRouter.go('home');
       }
-      return Tracker.autorun(function(c) {
+      Tracker.autorun(function(c) {
         if (FlowRouter.subsReady() === true) {
           Meteor.defer(function() {
             var room;
             if (Meteor.user().defaultRoom != null) {
               room = Meteor.user().defaultRoom.split('/');
-              return FlowRouter.go(room[0], {
+              FlowRouter.go(room[0], {
                 name: room[1]
               });
             } else {
-              return FlowRouter.go('home');
+              FlowRouter.go('home');
             }
           });
-          return c.stop();
+          c.stop();
         }
       });
     }
@@ -115,7 +121,7 @@ FlowRouter.route('/', {
 FlowRouter.route('/login', {
   name: 'login',
   action: function() {
-    return FlowRouter.go('home');
+    FlowRouter.go('home');
   }
 });
 
@@ -127,7 +133,14 @@ FlowRouter.route('/home', {
     if (context.queryParams.hasOwnProperty('data')) {
       Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result != null) {
-          return Meteor.loginWithPassword(result.email, result.password, function(error) {});
+          Meteor.loginWithPassword(result.email, result.password, function(error) {
+            RocketChat.CachedCollectionManager.clearAllCache();
+            if (result.chatWithEmail != null) {
+              FlowRouter.go('/direct/' + result.chatWithEmail);
+            } else {
+              FlowRouter.go('home');
+            }
+          });
         }
       });
     } else {
@@ -136,10 +149,10 @@ FlowRouter.route('/home', {
           var cookieName;
           if (ServerCookies.ready()) {
             cookieName = Meteor.settings['public'].cookieName;
-            return Meteor.call('getCookieByName', cookieName, function(err, result) {
+            Meteor.call('getCookieByName', cookieName, function(err, result) {
               if (result != null) {
-                return Meteor.call('getEmailByCookie', result, function(err, email) {
-                  return Meteor.owinLogin(email, function(error) {});
+                Meteor.call('getEmailByCookie', result, function(err, email) {
+                  Meteor.owinLogin(email, function(error) {});
                 });
               }
             });
@@ -151,7 +164,7 @@ FlowRouter.route('/home', {
     BlazeLayout.render('main', {
       center: 'home'
     });
-    return KonchatNotification.getDesktopPermission();
+    KonchatNotification.getDesktopPermission();
   }
 });
 
