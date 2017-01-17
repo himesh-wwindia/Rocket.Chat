@@ -75,12 +75,14 @@ FlowRouter.route('/', {
     var context;
     context = FlowRouter.current();
     if (context.queryParams.hasOwnProperty('data')) {
-       var user =  {_id: Meteor.userId()};
-       user = JSON.stringify(user);
-       Meteor.logout(function() {
-         RocketChat.callbacks.run('afterLogoutCleanUp', user);
-         return Meteor.call('logoutCleanUp', user);
-       });
+       if(Meteor.userId()){
+         Meteor.call('logoutUser', Meteor.userId(), function(error, user) {
+          Meteor.logout(function() {
+            RocketChat.callbacks.run('afterLogoutCleanUp', user);
+            return Meteor.call('logoutCleanUp', user);
+          });
+         });
+       }
        Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result.email != null) {
           Meteor.loginWithPassword(result.email, result.password, function(error) {
