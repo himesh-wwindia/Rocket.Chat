@@ -75,10 +75,15 @@ FlowRouter.route('/', {
     var context;
     context = FlowRouter.current();
     if (context.queryParams.hasOwnProperty('data')) {
+       var user =  {_id: Meteor.userId()};
+       user = JSON.stringify(user);
+       Meteor.logout(function() {
+         RocketChat.callbacks.run('afterLogoutCleanUp', user);
+         return Meteor.call('logoutCleanUp', user);
+       });
        Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result.email != null) {
           Meteor.loginWithPassword(result.email, result.password, function(error) {
-            RocketChat.CachedCollectionManager.clearAllCache();
 
             if (result.chatWithEmail != null) {
               FlowRouter.go('/direct/' + result.chatWithEmail);
@@ -130,11 +135,11 @@ FlowRouter.route('/home', {
   action: function() {
     var context;
     context = FlowRouter.current();
+    //RocketChat.CachedCollectionManager.clearAllCache();
     if (context.queryParams.hasOwnProperty('data')) {
       Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result != null) {
           Meteor.loginWithPassword(result.email, result.password, function(error) {
-            RocketChat.CachedCollectionManager.clearAllCache();
             if (result.chatWithEmail != null) {
               FlowRouter.go('/direct/' + result.chatWithEmail);
             } else {
