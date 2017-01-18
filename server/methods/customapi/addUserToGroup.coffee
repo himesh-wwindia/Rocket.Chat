@@ -4,7 +4,7 @@ Meteor.methods
     check userData.ClassRoomId, String
     now = new Date
     room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
-    user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+    user = RocketChat.models.Users.findOne('customFields.UserId': userData.UserId)
     # Check if user is already in room
     if !user
         apiUrl = Meteor.settings['public'].apiUrl
@@ -28,12 +28,15 @@ Meteor.methods
             'name': result.data.name
             'username': email
             'roles': [ role ]
-            'UserId':result.data.id.toString()
-            'profileURL':result.data.profileURL
-            'profileType':result.data.profileType
+            'customFields':{
+              'UserId':result.data.id.toString()
+              'profileURL':result.data.profileURL
+              'profileType':result.data.profileType
+              'SubscriptionCode': result.data.SubscriptionCode
+            }
           
           RocketChat.models.Users.update userId, update
-          user = RocketChat.models.Users.findOne(UserId: userData.UserId)
+          user = RocketChat.models.Users.findOne('customFields.UserId': userData.UserId)
     
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)

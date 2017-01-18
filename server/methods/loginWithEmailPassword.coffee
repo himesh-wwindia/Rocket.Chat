@@ -28,9 +28,12 @@ Meteor.methods
                   'name': result.data.name
                   'username': email
                   'roles': [ role ]
-                  'UserId':result.data.id.toString()
-                  'profileURL':result.data.profileURL
-                  'profileType':result.data.profileType
+                  'customFields': {
+                    'UserId':result.data.id.toString()
+                    'profileURL':result.data.profileURL
+                    'profileType':result.data.profileType
+                    'SubscriptionCode': result.data.SubscriptionCode
+                  }
                 
                 RocketChat.models.Users.update userId, update
                 

@@ -1,7 +1,7 @@
 Meteor.methods 
   removeUserFromGroup: (ClassRoomId, UserId) ->
     room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
-    user = RocketChat.models.Users.findOne(UserId: UserId)
+    user = RocketChat.models.Users.findOne('customFields.UserId': UserId)
     if !user
       error = 
         success: false

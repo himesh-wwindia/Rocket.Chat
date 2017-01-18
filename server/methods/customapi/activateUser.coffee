@@ -3,7 +3,7 @@ Meteor.methods
     check ClassRoomId, String
     check UserId, String
     room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
-    user = RocketChat.models.Users.findOne(UserId: UserId)
+    user = RocketChat.models.Users.findOne('customFields.UserId': UserId)
     if !user
       error =
         success: false

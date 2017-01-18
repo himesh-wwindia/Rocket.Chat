@@ -137,7 +137,6 @@ FlowRouter.route('/home', {
   action: function() {
     var context;
     context = FlowRouter.current();
-    //RocketChat.CachedCollectionManager.clearAllCache();
     if (context.queryParams.hasOwnProperty('data')) {
       Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result != null) {

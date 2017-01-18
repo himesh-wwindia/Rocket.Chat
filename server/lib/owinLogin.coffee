@@ -30,9 +30,12 @@ Accounts.registerLoginHandler (loginRequest) ->
         'name': loginRequest.data.name
         'username': email
         'roles': [ role ]
-        'UserId':loginRequest.data.id.toString()
-        'profileURL':loginRequest.data.profileURL
-        'profileType':loginRequest.data.profileType
+        'customFields': {
+                    'UserId':loginRequest.data.id.toString()
+                    'profileURL':loginRequest.data.profileURL
+                    'profileType':loginRequest.data.profileType
+                    'SubscriptionCode': loginRequest.data.SubscriptionCode
+                  }
       
       RocketChat.models.Users.update userId, update
 

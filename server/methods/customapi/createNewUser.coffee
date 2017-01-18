@@ -23,11 +23,14 @@ Meteor.methods
         update = '$set':
           'name': user.UserName
           'username': user.UserName
-          'UserId': user.UserId
-          'UserLogo': user.UserLogo
-          'GuidId': user.GuidId
           'roles': [ role ]
-        
+          'customFields': {
+            'UserId': user.UserId
+            'UserLogo': user.UserLogo
+            'GuidId': user.GuidId
+          }
+
+      
         RocketChat.models.Users.update userId, update
         return userId
 
