@@ -20,9 +20,9 @@ Meteor.publish 'userAutocomplete', (selector) ->
     
     user = RocketChat.models.Users.findOne(username: exceptions[0])
     flag = false
-    if user.profileType != 3
+    users = []
+    if user.customFields['profileType'] != 3
         chatRoomUsers = RocketChat.models.Rooms.findUserChatRoomByUsername(exceptions[0])
-        users = []
         chatRoomUsers.forEach (doc) ->
           doc.usernames.forEach (user) ->
             if exceptions[0] != user
