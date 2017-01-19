@@ -4,8 +4,11 @@ Meteor.methods
       check group.Name, String
       check group.ClassRoomId, String
       
+      # Get room/group record by using ClassRoomId
       room = RocketChat.models.Rooms.findOne(ClassRoomId: group.ClassRoomId)
       
+      # if room/group is not available then chnage group name otherwise 
+      # create new group.
       if room?
         name = group.Name
         RocketChat.models.Rooms.setNameById room._id, name

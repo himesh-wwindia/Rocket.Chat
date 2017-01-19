@@ -73,8 +73,11 @@ FlowRouter.route('/', {
   name: 'index',
   action: function() {
     var context;
+    //Get context object from current url.
     context = FlowRouter.current();
+    // check context having data query params.
     if (context.queryParams.hasOwnProperty('data')) {
+       //if user is already login in same browser firstly logout user.
        if(Meteor.userId()){
          Meteor.call('logoutUser', Meteor.userId(), function(error, user) {
           Meteor.logout(function() {
@@ -83,8 +86,10 @@ FlowRouter.route('/', {
           });
          });
        }
+       // call loginWithEmailPassword to decrypt data params and get email and password
        Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result.email != null) {
+          //call meteor loginWithPassword to lgoin into chat application.
           Meteor.loginWithPassword(result.email, result.password, function(error) {
 
             if (result.chatWithEmail != null) {
@@ -136,10 +141,13 @@ FlowRouter.route('/home', {
   name: 'home',
   action: function() {
     var context;
+    //Get context object from current url.
     context = FlowRouter.current();
+    // check context having data query params.
     if (context.queryParams.hasOwnProperty('data')) {
       Meteor.call('loginWithEmailPassword', context.queryParams, function(error, result) {
         if (result != null) {
+          //call meteor loginWithPassword to lgoin into chat application.
           Meteor.loginWithPassword(result.email, result.password, function(error) {
             if (result.chatWithEmail != null) {
               FlowRouter.go('/direct/' + result.chatWithEmail);
@@ -153,11 +161,16 @@ FlowRouter.route('/home', {
       if (Meteor.isClient) {
         Deps.autorun(function() {
           var cookieName;
+          // check ServerCookies is ready
           if (ServerCookies.ready()) {
             cookieName = Meteor.settings['public'].cookieName;
+            // call  getCookieByName method to cookie from browser localstorage by cookie name
             Meteor.call('getCookieByName', cookieName, function(err, result) {
+              // if cookie is available then get email from cookie
               if (result != null) {
+                //call getEmailByCookie to get email from cookie
                 Meteor.call('getEmailByCookie', result, function(err, email) {
+                  //call meteor owinLogin method to login into chat application.
                   Meteor.owinLogin(email, function(error) {});
                 });
               }

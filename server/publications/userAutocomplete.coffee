@@ -17,16 +17,19 @@ Meteor.publish 'userAutocomplete', (selector) ->
     pub = this
 
     exceptions = selector.exceptions or []
-    
+    # get current loggedIn user
     user = RocketChat.models.Users.findOne(username: exceptions[0])
     flag = false
     users = []
+    # if user has profileType is not 3 who can chat only users in group have allowStudentTochatTogether is true.
     if user.customFields['profileType'] != 3
+        # get users in which group have allowStudentTochatTogether is true.
         chatRoomUsers = RocketChat.models.Rooms.findUserChatRoomByUsername(exceptions[0])
         chatRoomUsers.forEach (doc) ->
           doc.usernames.forEach (user) ->
             if exceptions[0] != user
                 users.push user
+        # if users length is 0 then don't show any users for direct message.
         if users.length == 0
             flag = true
         

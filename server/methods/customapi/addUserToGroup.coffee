@@ -4,9 +4,11 @@ Meteor.methods
     check userData.ClassRoomId, String
     now = new Date
     room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
-    user = RocketChat.models.Users.findOne('customFields.UserId': userData.UserId)
-    # Check if user is already in room
+    user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: userData.UserId } } })
+    
+    # Check if user is exists otherwise add user in application
     if !user
+        # call rest api and get user details from edaura application.
         apiUrl = Meteor.settings['public'].apiUrl
         url = apiUrl + '?userID=' + userData.UserId
         result = HTTP.call('POST', url)
@@ -36,10 +38,12 @@ Meteor.methods
             }
           
           RocketChat.models.Users.update userId, update
-          user = RocketChat.models.Users.findOne('customFields.UserId': userData.UserId)
+          user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: userData.UserId } } })
     
+    # if room is available add user to group.
     if room
       subscription = RocketChat.models.Subscriptions.findOneByRoomIdAndUserId(room._id, user._id)
+      # if user already added in group then send response as user already exists.
       if subscription
         error = 
           success: false
@@ -49,6 +53,8 @@ Meteor.methods
       muted = room.ro and !RocketChat.authz.hasPermission(user._id, 'post-readonly')
       RocketChat.models.Rooms.addUsernameById room._id, user.username, muted
       role = ''
+      
+      # if IsGroupAdmin is true set role as group owner otherwise as user.
       if userData.IsGroupAdmin == 'true' or userData.IsGroupAdmin == true
         role = 'owner'
       else

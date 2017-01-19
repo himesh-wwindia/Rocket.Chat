@@ -3,8 +3,9 @@ Meteor.methods
     check ClassRoomId, String
     check UserId, String
     room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
-    user = RocketChat.models.Users.findOne('customFields.UserId': UserId)
+    user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: UserId } } })
     
+    # if user is not exists then send response userId is not exists.
     if !user
       error =
         success: false
@@ -12,6 +13,7 @@ Meteor.methods
         userId: userId
       return error
     
+    # if room is exists deactivate user from group.
     if room
       mutedUser = RocketChat.models.Users.findOneByUsername(user.username)
       RocketChat.models.Rooms.muteUsernameByRoomId room._id, mutedUser.username
