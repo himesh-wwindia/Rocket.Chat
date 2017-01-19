@@ -2,7 +2,10 @@ Meteor.methods
   activateDeactivateGroup: (data) ->
     try
       check data.ClassRoomId, String
+      # Get room/group record by using ClassRoomId
       room = RocketChat.models.Rooms.findOne(ClassRoomId: data.ClassRoomId)
+      # if room/group is exists then activate deactivate room otherwise 
+      # send error ClassRooomId is not exist.
       if room
         if data.IsActive == 'true' or data.IsActive == true
           RocketChat.models.Rooms.unarchiveById(room._id)

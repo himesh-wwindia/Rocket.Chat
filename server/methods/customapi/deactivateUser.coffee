@@ -3,7 +3,7 @@ Meteor.methods
     check ClassRoomId, String
     check UserId, String
     room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
-    user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: UserId } } })
+    user = RocketChat.models.Users.findUserByCustomField(UserId)
     
     # if user is not exists then send response userId is not exists.
     if !user

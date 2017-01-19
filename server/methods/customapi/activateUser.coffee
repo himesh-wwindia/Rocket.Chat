@@ -5,9 +5,9 @@ Meteor.methods
     # Get room/group record by using ClassRoomId
     room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
     # Get user record by using UserId
-    user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: UserId } } })
+    user = RocketChat.models.Users.findUserByCustomField(UserId)
 
-    # if user is available then activate user in room otherwise 
+    # if user is exists then activate user in room otherwise 
     # send error UserId is not exists.
     if !user
       error =
@@ -16,7 +16,7 @@ Meteor.methods
         UserId: UserId
       return error
 
-    # if room/group is available then activate user in room otherwise 
+    # if room/group is exists then activate user in room otherwise 
     # send error ClassRooomId is not exist.
     if room
       unmutedUser = RocketChat.models.Users.findOneByUsername(user.username)

@@ -4,7 +4,7 @@ Meteor.methods
     check userData.ClassRoomId, String
     now = new Date
     room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
-    user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: userData.UserId } } })
+    user = RocketChat.models.Users.findUserByCustomField(userData.UserId)
     
     # Check if user is exists otherwise add user in application
     if !user
@@ -38,7 +38,7 @@ Meteor.methods
             }
           
           RocketChat.models.Users.update userId, update
-          user = RocketChat.models.Users.findOne({ customFields: { $elemMatch: { UserId: userData.UserId } } })
+          user = RocketChat.models.Users.findUserByCustomField(userData.UserId)
     
     # if room is available add user to group.
     if room

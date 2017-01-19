@@ -437,4 +437,10 @@ class ModelUsers extends RocketChat.models._Base
 
         return @find query, { fields: { name: 1, username: 1, emails: 1, 'settings.preferences.emailNotificationMode': 1 } }
 
+    findUserByCustomField: (UserId) ->
+        query =
+            'customFields.UserId': UserId
+             
+        return @findOne query    
+
 RocketChat.models.Users = new ModelUsers(Meteor.users, true)

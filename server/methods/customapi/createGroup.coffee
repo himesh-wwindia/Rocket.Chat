@@ -7,7 +7,7 @@ Meteor.methods
       # Get room/group record by using ClassRoomId
       room = RocketChat.models.Rooms.findOne(ClassRoomId: group.ClassRoomId)
       
-      # if room/group is not available then chnage group name otherwise 
+      # if room/group is exists then chnage group name otherwise 
       # create new group.
       if room?
         name = group.Name

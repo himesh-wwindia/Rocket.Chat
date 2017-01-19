@@ -5,7 +5,8 @@ Meteor.methods
         check user.UserName, String
         check user.UserLogo, String
         check user.UserId, String
-       
+        
+        # check email is valid or not or email is already exists in database.
         RocketChat.validateEmailDomain user.Email
         password = Meteor.settings['private'].password
         userData =
