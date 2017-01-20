@@ -605,9 +605,16 @@ class ModelRooms extends RocketChat.models._Base
            usernames : 1
         
         query =
-            allowStudentTochatTogether: true
+            'customFields.allowStudentTochatTogether': true
             usernames: username.toString()
      
         return @find query, options
+
+    findGroupByCustomField: (ClassRoomId) ->
+        query =
+            'customFields.ClassRoomId': ClassRoomId
+             
+        return @findOne query    
+
 
 RocketChat.models.Rooms = new ModelRooms('room', true)

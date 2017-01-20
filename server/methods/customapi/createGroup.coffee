@@ -22,8 +22,12 @@ Meteor.methods
           u:
             _id: null
             username: null
-          ClassRoomId: group.ClassRoomId
-          allowStudentTochatTogether:group.allowStudentTochatTogether
+
+          'customFields': {
+              ClassRoomId: group.ClassRoomId
+              allowStudentTochatTogether:group.allowStudentTochatTogether
+          }
+
         
         group = RocketChat.models.Rooms.insert(groupData)
         return group

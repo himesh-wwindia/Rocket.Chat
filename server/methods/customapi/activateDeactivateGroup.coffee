@@ -3,7 +3,7 @@ Meteor.methods
     try
       check data.ClassRoomId, String
       # Get room/group record by using ClassRoomId
-      room = RocketChat.models.Rooms.findOne(ClassRoomId: data.ClassRoomId)
+      room = RocketChat.models.Rooms.findGroupByCustomField(data.ClassRoomId)
       # if room/group is exists then activate deactivate room otherwise 
       # send error ClassRooomId is not exist.
       if room

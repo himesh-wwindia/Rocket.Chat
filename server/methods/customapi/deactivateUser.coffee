@@ -2,7 +2,7 @@ Meteor.methods
   deactivateUser: (ClassRoomId, UserId) ->
     check ClassRoomId, String
     check UserId, String
-    room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
+    room = RocketChat.models.Rooms.findGroupByCustomField(ClassRoomId)
     user = RocketChat.models.Users.findUserByCustomField(UserId)
     
     # if user is not exists then send response userId is not exists.

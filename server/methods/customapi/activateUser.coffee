@@ -3,7 +3,7 @@ Meteor.methods
     check ClassRoomId, String
     check UserId, String
     # Get room/group record by using ClassRoomId
-    room = RocketChat.models.Rooms.findOne(ClassRoomId: ClassRoomId)
+    room = RocketChat.models.Rooms.findGroupByCustomField(ClassRoomId)
     # Get user record by using UserId
     user = RocketChat.models.Users.findUserByCustomField(UserId)
 

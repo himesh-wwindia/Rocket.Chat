@@ -3,7 +3,7 @@ Meteor.methods
    # check userData.UserId, Number
     check userData.ClassRoomId, String
     now = new Date
-    room = RocketChat.models.Rooms.findOne(ClassRoomId: userData.ClassRoomId)
+    room = RocketChat.models.Rooms.findGroupByCustomField(userData.ClassRoomId)
     user = RocketChat.models.Users.findUserByCustomField(userData.UserId)
     
     # Check if user is exists otherwise add user in application
