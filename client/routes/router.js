@@ -139,7 +139,7 @@ FlowRouter.route('/login', {
 
 FlowRouter.route('/home', {
   name: 'home',
-  action: function() {
+  action: function(params, queryParams) {
     var context;
     //Get context object from current url.
     context = FlowRouter.current();
@@ -179,10 +179,22 @@ FlowRouter.route('/home', {
         });
       }
     }
-    RocketChat.TabBar.showGroup('home');
-    BlazeLayout.render('main', {
-      center: 'home'
-    });
+    KonchatNotification.getDesktopPermission();
+    if (queryParams.saml_idp_credentialToken !== undefined) {
+      Accounts.callLoginMethod({
+        methodArguments: [{
+          saml: true,
+          credentialToken: queryParams.saml_idp_credentialToken
+        }],
+        userCallback: function() { BlazeLayout.render('main', {center: 'home'}); }
+      });
+    } else {
+      BlazeLayout.render('main', {center: 'home'});
+    }
+    // RocketChat.TabBar.showGroup('home');
+    // BlazeLayout.render('main', {
+    //   center: 'home'
+    // });
     KonchatNotification.getDesktopPermission();
   }
 });

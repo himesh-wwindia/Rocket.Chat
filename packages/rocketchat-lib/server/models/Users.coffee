@@ -10,11 +10,6 @@ class ModelUsers extends RocketChat.models._Base
         @tryEnsureIndex { 'statusConnection': 1 }, { sparse: 1 }
         @tryEnsureIndex { 'type': 1 }
 
-
-    # FIND ONE
-    findOneById: (_id, options) ->
-        return @findOne _id, options
-
     findOneByImportId: (_id, options) ->
         return @findOne { importIds: _id }, options
 
@@ -436,11 +431,13 @@ class ModelUsers extends RocketChat.models._Base
             'emails.verified': true
 
         return @find query, { fields: { name: 1, username: 1, emails: 1, 'settings.preferences.emailNotificationMode': 1 } }
-
+    
+    # Find user by Custom field.
     findUserByCustomField: (UserId) ->
         query =
             'customFields.UserId': UserId
              
         return @findOne query    
+
 
 RocketChat.models.Users = new ModelUsers(Meteor.users, true)

@@ -1,3 +1,4 @@
+
 class ModelRooms extends RocketChat.models._Base
     constructor: ->
         super(arguments...)
@@ -11,16 +12,6 @@ class ModelRooms extends RocketChat.models._Base
         this.cache.ignoreUpdatedFields.push('msgs', 'lm')
         this.cache.ensureIndex(['t', 'name'], 'unique')
         this.cache.options = {fields: {usernames: 0}}
-
-    # FIND ONE
-    findOneById: (_id, options) ->
-        if this.useCache
-            return this.cache.findByIndex('_id', _id, options).fetch()
-
-        query =
-            _id: _id
-
-        return @findOne query, options
 
     findOneByIdOrName: (_idOrName, options) ->
         query = {
@@ -599,7 +590,7 @@ class ModelRooms extends RocketChat.models._Base
             usernames: username
 
         return @remove query
-
+    
     findUserChatRoomByUsername:(username) ->
         options =
            usernames : 1
