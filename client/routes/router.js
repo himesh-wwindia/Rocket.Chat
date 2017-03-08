@@ -114,11 +114,13 @@ FlowRouter.route('/', {
         if (FlowRouter.subsReady() === true) {
           Meteor.defer(function() {
             var room;
-            if (Meteor.user().defaultRoom != null) {
-              room = Meteor.user().defaultRoom.split('/');
-              FlowRouter.go(room[0], {
-                name: room[1]
-              });
+            if (Meteor.user()) {
+              if(Meteor.user().defaultRoom){
+                room = Meteor.user().defaultRoom.split('/');
+                FlowRouter.go(room[0], {
+                  name: room[1]
+                });
+              }
             } else {
               FlowRouter.go('home');
             }

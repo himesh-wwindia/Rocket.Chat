@@ -122,7 +122,7 @@ class ModelUsers extends RocketChat.models._Base
                 }
 
             _.extend query, data
-
+        
         return @find query, options
 
     findByActiveUsersUsernameExcept: (searchTerm, exceptions = [], options = {}) ->
