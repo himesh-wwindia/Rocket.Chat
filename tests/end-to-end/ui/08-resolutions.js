@@ -1,29 +1,27 @@
 /* eslint-env mocha */
 /* eslint-disable func-names, prefer-arrow-callback */
 
+import Global from '../../pageobjects/global';
 import mainContent from '../../pageobjects/main-content.page';
 import sideNav from '../../pageobjects/side-nav.page';
 
 import {username, email, password} from '../../data/user.js';
 import {checkIfUserIsValid} from '../../data/checks';
 
-describe.skip('resolutions tests', ()=> {
+describe('resolutions tests', ()=> {
 	describe('mobile render', ()=> {
 		before(()=> {
 			checkIfUserIsValid(username, email, password);
 			sideNav.getChannelFromList('general').waitForExist(5000);
 			sideNav.openChannel('general');
-			browser.windowHandleSize({
-				width: 650,
-				height: 800
-			});
+			Global.setWindowSize(650, 800);
 		});
 
 		after(()=> {
-			browser.windowHandleSize({
-				width: 1450,
-				height: 900
-			});
+			Global.setWindowSize(1450, 900);
+			sideNav.preferencesClose.waitForVisible(5000);
+			sideNav.preferencesClose.click();
+			sideNav.spotlightSearch.waitForVisible(5000);
 		});
 
 		describe('moving elements ', () => {
@@ -32,7 +30,7 @@ describe.skip('resolutions tests', ()=> {
 			});
 
 			it('press the navbar button', () => {
-				sideNav.sideNavBtn.click();
+				sideNav.burgerBtn.click();
 			});
 
 			it('should open de sidenav', () => {
@@ -48,18 +46,18 @@ describe.skip('resolutions tests', ()=> {
 			});
 
 			it('press the navbar button', () => {
-				sideNav.sideNavBtn.click();
+				sideNav.burgerBtn.click();
 			});
 
 			it('opens the user preferences screen', () => {
-				sideNav.accountBoxUserName.waitForVisible();
+				sideNav.accountBoxUserName.waitForVisible(5000);
 				sideNav.accountBoxUserName.click();
-				sideNav.account.waitForVisible();
+				sideNav.account.waitForVisible(5000);
 				sideNav.account.click();
 			});
 
 			it('press the preferences link', () => {
-				sideNav.preferences.waitForVisible();
+				sideNav.preferences.waitForVisible(5000);
 				sideNav.preferences.click();
 			});
 
@@ -68,11 +66,11 @@ describe.skip('resolutions tests', ()=> {
 			});
 
 			it('press the navbar button', () => {
-				sideNav.sideNavBtn.click();
+				sideNav.burgerBtn.click();
 			});
 
 			it('press the profile link', () => {
-				sideNav.profile.waitForVisible();
+				sideNav.profile.waitForVisible(5000);
 				sideNav.profile.click();
 			});
 
@@ -81,11 +79,11 @@ describe.skip('resolutions tests', ()=> {
 			});
 
 			it('press the navbar button', () => {
-				sideNav.sideNavBtn.click();
+				sideNav.burgerBtn.click();
 			});
 
 			it('press the avatar link', () => {
-				sideNav.avatar.waitForVisible();
+				sideNav.avatar.waitForVisible(5000);
 				sideNav.avatar.click();
 			});
 
@@ -94,11 +92,7 @@ describe.skip('resolutions tests', ()=> {
 			});
 
 			it('press the navbar button', () => {
-				sideNav.sideNavBtn.click();
-			});
-
-			it('close the preferences menu', () => {
-				sideNav.preferencesClose.click();
+				sideNav.burgerBtn.click();
 			});
 		});
 	});

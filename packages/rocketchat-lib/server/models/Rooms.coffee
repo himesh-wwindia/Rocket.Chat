@@ -1,4 +1,3 @@
-
 class ModelRooms extends RocketChat.models._Base
     constructor: ->
         super(arguments...)
@@ -398,6 +397,16 @@ class ModelRooms extends RocketChat.models._Base
 
         return @update query, update
 
+    incMsgCountById: (_id, inc=1) ->
+        query =
+            _id: _id
+
+        update =
+            $inc:
+                msgs: inc
+
+        return @update query, update
+
     incMsgCountAndSetLastMessageTimestampById: (_id, inc=1, lastMessageTimestamp) ->
         query =
             _id: _id
@@ -601,11 +610,5 @@ class ModelRooms extends RocketChat.models._Base
      
         return @find query, options
 
-    findGroupByCustomField: (ClassRoomId) ->
-        query =
-            'customFields.ClassRoomId': ClassRoomId
-             
-        return @findOne query    
-
-
+  
 RocketChat.models.Rooms = new ModelRooms('room', true)

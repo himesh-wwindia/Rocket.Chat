@@ -159,28 +159,7 @@ FlowRouter.route('/home', {
           });
         }
       });
-    } else {
-      if (Meteor.isClient) {
-        Deps.autorun(function() {
-          var cookieName;
-          // check ServerCookies is ready
-          if (ServerCookies.ready()) {
-            cookieName = Meteor.settings['public'].cookieName;
-            // call  getCookieByName method to cookie from browser localstorage by cookie name
-            Meteor.call('getCookieByName', cookieName, function(err, result) {
-              // if cookie is available then get email from cookie
-              if (result != null) {
-                //call getEmailByCookie to get email from cookie
-                Meteor.call('getEmailByCookie', result, function(err, email) {
-                  //call meteor owinLogin method to login into chat application.
-                  Meteor.owinLogin(email, function(error) {});
-                });
-              }
-            });
-          }
-        });
-      }
-    }
+    } 
     KonchatNotification.getDesktopPermission();
     if (queryParams.saml_idp_credentialToken !== undefined) {
       Accounts.callLoginMethod({

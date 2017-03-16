@@ -4,13 +4,10 @@ Template.body.onRendered ->
 	clipboard = new Clipboard('.clipboard')
 
 	$(document.body).on 'keydown', (e) ->
-		if e.keyCode is 80 and (e.ctrlKey is true or e.metaKey is true) and e.shiftKey is false
+		if e.keyCode in [80, 75] and (e.ctrlKey is true or e.metaKey is true) and e.shiftKey is false
 			e.preventDefault()
 			e.stopPropagation()
-			spotlight.show()
-
-		if e.keyCode is 27
-			spotlight.hide()
+			toolbarSearch.focus(true)
 
 		unread = Session.get('unread')
 		if e.keyCode is 27 and e.shiftKey is true and unread? and unread isnt ''
@@ -37,12 +34,13 @@ Template.body.onRendered ->
 			return
 		if /input|textarea|select/i.test(target.tagName)
 			return
-		if $.swipebox.isOpen
+		if target.id is 'pswp'
 			return
-		$inputMessage = $('textarea.input-message')
-		if 0 == $inputMessage.length
+
+		inputMessage = $('textarea.input-message')
+		if inputMessage.length is 0
 			return
-		$inputMessage.focus()
+		inputMessage.focus()
 
 	$(document.body).on 'click', 'a', (e) ->
 		link = e.currentTarget
@@ -54,12 +52,6 @@ Template.body.onRendered ->
 				return fireGlobalEvent('click-message-link', { link: link.pathname + link.search })
 
 			FlowRouter.go(link.pathname + link.search, null, FlowRouter.current().queryParams)
-
-		if $(link).hasClass('swipebox')
-			if RocketChat.Layout.isEmbedded()
-				e.preventDefault()
-				e.stopPropagation()
-				fireGlobalEvent('click-image-link', { href: link.href })
 
 	Tracker.autorun (c) ->
 		w = window
@@ -237,7 +229,10 @@ Template.main.onRendered ->
 				$('.input-message').focus()
 		, 100
 
+
 	Tracker.autorun ->
+		swal.setDefaults({cancelButtonText: t('Cancel')})
+
 		prefs = Meteor.user()?.settings?.preferences
 		if prefs?.hideUsernames
 			$(document.body).on('mouseleave', 'button.thumb', (e) ->
