@@ -4,7 +4,7 @@ Meteor.methods
         if queryParams.data?
             data = new Buffer(queryParams.data, 'base64').toString('utf8')
             credential = data.split(';')
-            email = credential[0].toLowerCase()
+            email = credential[0]
             password = credential[1]
             userId = credential[2]
             chatWithEmail = credential[3]
@@ -20,7 +20,7 @@ Meteor.methods
                 result = HTTP.call('POST', url)
                 # if profileType is 3 make it as admin.
                 if result.data.profileType == 3
-                  role = "admin"
+                  role = "teacher"
                 else
                   role = "user"
 
@@ -48,3 +48,7 @@ Meteor.methods
                 password:password
                 chatWithEmail:chatWithEmail
             return result
+
+    logoutUser:(userId) ->
+        # get user by using userId.
+        user = Meteor.users.findOne({_id: userId});
